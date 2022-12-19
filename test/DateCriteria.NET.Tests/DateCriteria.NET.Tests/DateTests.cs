@@ -62,6 +62,19 @@ public class DateTests
 		Assert.True(criteria.Contains(new DateOnly(2022, 12, 31)));
 		Assert.False(criteria.Contains(new DateOnly(2022, 12, 30)));
 	}
+
+	[Fact]
+	public void DocumentationTest()
+	{
+		var criteria = new DateCriteria();
+		criteria.AddCriterion("Date == EndOfMonth; DayOfWeek != Wednesday");
+		criteria.AddCriterion("DayOfWeek == Saturday");
+		criteria.AddCriterion("DayOfWeek == Sunday");
+
+		Assert.False(criteria.Contains(new DateOnly(2022, 11, 30)));
+		Assert.True(criteria.Contains(new DateOnly(2022, 12, 17)));
+		Assert.True(criteria.Contains(new DateOnly(2023, 01, 31)));
+	}
 }
 
 // Want to create a Criteria Set, which can be named. E.g. business calendar days, friend's birthdays, etc.
