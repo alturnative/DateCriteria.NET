@@ -1,9 +1,9 @@
 ﻿namespace DateCriteria.NET;
 
-public interface IDateCriterion
+public interface IDateRule
 {
 	bool Negate { get; }
-	ISet<Rule> Rules { get; }
+	ISet<DateConstraint> Constraints { get; }
 
 	bool Matches(DateOnly date);
 }

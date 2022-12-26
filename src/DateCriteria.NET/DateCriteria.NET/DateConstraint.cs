@@ -1,13 +1,13 @@
 ﻿namespace DateCriteria.NET;
 
-public class Rule
+public class DateConstraint
 {
 	internal string RuleText { get; set; } = string.Empty;
 	internal Func<DateOnly, bool> RuleAction { get; set; }
 
 	public override string ToString() => RuleText;
 
-	protected bool Equals(Rule other)
+	protected bool Equals(DateConstraint other)
 	{
 		return string.Equals(RuleText, other.RuleText, StringComparison.OrdinalIgnoreCase);
 	}
@@ -17,7 +17,7 @@ public class Rule
 		if (ReferenceEquals(null, obj)) return false;
 		if (ReferenceEquals(this, obj)) return true;
 		if (obj.GetType() != this.GetType()) return false;
-		return Equals((Rule)obj);
+		return Equals((DateConstraint)obj);
 	}
 
 	public override int GetHashCode()
@@ -25,12 +25,12 @@ public class Rule
 		return StringComparer.OrdinalIgnoreCase.GetHashCode(RuleText);
 	}
 
-	public static bool operator ==(Rule? left, Rule? right)
+	public static bool operator ==(DateConstraint? left, DateConstraint? right)
 	{
 		return Equals(left, right);
 	}
 
-	public static bool operator !=(Rule? left, Rule? right)
+	public static bool operator !=(DateConstraint? left, DateConstraint? right)
 	{
 		return !Equals(left, right);
 	}

@@ -1,8 +1,8 @@
 # DateCriteria.NET
 
-A date flag calcalator that accepts very basic but dynamic input criteria.
-The rules within a criterion must *all* be satisfied for the criterion to be
-considered a match for a given date, and *any* of the criteria can match
+A date flag calculator that accepts very basic but dynamic input criteria.
+The constraints within a rule must *all* be satisfied for the rule to be
+considered a match for a given date, and *any* of the rules can match
 for a date to be considered satisfying that criteria as a whole. This can be
 used in any situation where calendar dates need to be flagged as meeting a
 specific criteria, such as: business v.s. non-business days, 
@@ -11,9 +11,9 @@ Example:
 
 ```csharp
 var criteria = new DateCriteria();
-criteria.AddCriterion("Date == EndOfMonth; DayOfWeek != Wednesday");
-criteria.AddCriterion("DayOfWeek == Saturday");
-criteria.AddCriterion("DayOfWeek == Sunday");
+criteria.AddRule("Date == EndOfMonth; DayOfWeek != Wednesday");
+criteria.AddRule("DayOfWeek == Saturday");
+criteria.AddRule("DayOfWeek == Sunday");
 
 criteria.Contains(new DateOnly(2022, 11, 30); // False, end of month falls on a Wednesday
 criteria.Contains(new DateOnly(2022, 12, 17); // True, weekend

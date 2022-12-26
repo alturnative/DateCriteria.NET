@@ -1,3 +1,5 @@
+using DateCriteria.NET;
+
 namespace DateCriteria.NET.Tests;
 
 public class DateTests
@@ -6,8 +8,8 @@ public class DateTests
 	public void SpecifiedDatesTest()
 	{
 		var criteria = new DateCriteria();
-		criteria.AddCriterion("date != 2022-12-19;date < 2022-12-19;date <= 2022-12-19");
-		criteria.AddCriterion("date == 2022-12-25");
+		criteria.AddRule("date != 2022-12-19;date < 2022-12-19;date <= 2022-12-19");
+		criteria.AddRule("date == 2022-12-25");
 		Assert.True(criteria.Contains(new DateOnly(2022, 12, 15)));
 		Assert.True(criteria.Contains(new DateOnly(2022, 12, 25)));
 		Assert.False(criteria.Contains(new DateOnly(2022, 12, 19)));
@@ -17,8 +19,8 @@ public class DateTests
 	public void DayOfWeekTest()
 	{
 		var criteria = new DateCriteria();
-		criteria.AddCriterion("dayofweek != wednesday;dayofweek == friday");
-		criteria.AddCriterion("dayofweek == sunday");
+		criteria.AddRule("dayofweek != wednesday;dayofweek == friday");
+		criteria.AddRule("dayofweek == sunday");
 		Assert.True(criteria.Contains(new DateOnly(2022, 12, 16)));
 		Assert.False(criteria.Contains(new DateOnly(2022, 12, 17)));
 		Assert.True(criteria.Contains(new DateOnly(2022, 12, 18)));
@@ -31,8 +33,8 @@ public class DateTests
 	public void DayOfWeekNegateTest()
 	{
 		var criteria = new DateCriteria { Negate = true };
-		criteria.AddCriterion("dayofweek != wednesday;dayofweek == friday");
-		criteria.AddCriterion("dayofweek == sunday");
+		criteria.AddRule("dayofweek != wednesday;dayofweek == friday");
+		criteria.AddRule("dayofweek == sunday");
 		Assert.False(criteria.Contains(new DateOnly(2022, 12, 16)));
 		Assert.True(criteria.Contains(new DateOnly(2022, 12, 17)));
 		Assert.False(criteria.Contains(new DateOnly(2022, 12, 18)));
@@ -45,8 +47,8 @@ public class DateTests
 	public void DayMonthYearTest()
 	{
 		var criteria = new DateCriteria();
-		criteria.AddCriterion("day==4;month==12;year==2022");
-		criteria.AddCriterion("year<=2010");
+		criteria.AddRule("day==4;month==12;year==2022");
+		criteria.AddRule("year<=2010");
 		Assert.False(criteria.Contains(new DateOnly(2022, 12, 21)));
 		Assert.True(criteria.Contains(new DateOnly(2022, 12, 04)));
 		Assert.True(criteria.Contains(new DateOnly(2002, 12, 04)));
@@ -58,7 +60,7 @@ public class DateTests
 	public void EndOfMonthTest()
 	{
 		var criteria = new DateCriteria();
-		criteria.AddCriterion("date == endofmonth");
+		criteria.AddRule("date == endofmonth");
 		Assert.True(criteria.Contains(new DateOnly(2022, 12, 31)));
 		Assert.False(criteria.Contains(new DateOnly(2022, 12, 30)));
 	}
@@ -67,13 +69,53 @@ public class DateTests
 	public void DocumentationTest()
 	{
 		var criteria = new DateCriteria();
-		criteria.AddCriterion("Date == EndOfMonth; DayOfWeek != Wednesday");
-		criteria.AddCriterion("DayOfWeek == Saturday");
-		criteria.AddCriterion("DayOfWeek == Sunday");
+		criteria.AddRule("Date == EndOfMonth; DayOfWeek != Wednesday");
+		criteria.AddRule("DayOfWeek == Saturday");
+		criteria.AddRule("DayOfWeek == Sunday");
 
 		Assert.False(criteria.Contains(new DateOnly(2022, 11, 30)));
 		Assert.True(criteria.Contains(new DateOnly(2022, 12, 17)));
 		Assert.True(criteria.Contains(new DateOnly(2023, 01, 31)));
+	}
+
+	[Fact]
+	public void EasterTest()
+	{
+		var criteria = new DateCriteria();
+		criteria.AddRule("Date == Easter");
+		Assert.False(criteria.Contains(new DateOnly(1900, 04, 14)));
+		Assert.True(criteria.Contains(new DateOnly(1900, 04, 15)));
+	}
+
+	[Fact]
+	public void EasterMondayTest()
+	{
+		var criteria = new DateCriteria();
+		criteria.AddRule("Date == Easter + 1");
+		Assert.False(criteria.Contains(new DateOnly(1900, 04, 14)));
+		Assert.True(criteria.Contains(new DateOnly(1900, 04, 16)));
+		Assert.Throws<Exception>(() => criteria.Contains(new DateOnly(3000, 01, 01)));
+	}
+
+	[Fact]
+	public void ArithemticTest()
+	{
+		var criteria = new DateCriteria();
+		criteria.AddRule("Date == EndOfMonth - 3");
+		criteria.AddRule("Date < EndOfMonth - 10");
+		Assert.False(criteria.Contains(new DateOnly(2022, 12, 31)));
+		Assert.True(criteria.Contains(new DateOnly(2022, 12, 28)));
+		Assert.False(criteria.Contains(new DateOnly(2022, 12, 21)));
+		Assert.True(criteria.Contains(new DateOnly(2022, 12, 20)));
+	}
+
+	[Fact]
+	public void EmptyTest()
+	{
+		var criteria = new DateCriteria();
+		Assert.False(criteria.Contains(new DateOnly(2022, 12, 10)));
+		criteria = new DateCriteria { Negate = true };
+		Assert.True(criteria.Contains(new DateOnly(2022, 12, 10)));
 	}
 }
 
