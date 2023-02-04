@@ -47,9 +47,16 @@ public static class ConstraintParser
 
 	private static Func<DateOnly, ValueObject> GetValueFunction(string input, out Token token)
 	{
-		token = 0;
-		if (DateOnly.TryParseExact(input, "yyyy-MM-dd", out var date)) return x => new ValueObject { Date = date };
-		if (int.TryParse(input, out int result)) return x => new ValueObject { Value = result };
+		if (DateOnly.TryParseExact(input, "yyyy-MM-dd", out var date))
+		{
+			token = Token.Date;
+			return x => new ValueObject { Date = date };
+		}
+		if (int.TryParse(input, out int value))
+		{
+			token = Token.Day;
+			return x => new ValueObject { Value = value };
+		}
 		
 		var expression = Operators.Arithmetic.Split(input);
 		if (expression.Length is not (1 or 3)) throw new Exception($"Invalid expression in comparison: '{input}'.");
