@@ -83,17 +83,20 @@ public static class ConstraintParser
 				token = Token.DayOfWeek;
 				return x => new ValueObject { DayOfWeek = dow };
 			}
+
+			throw new NotImplementedException();
 		}
-		else // horrible, complex, arithmetic expression :(
-		{
-			var lTrim = expression[0].Trim();
-			var op = expression[1].Trim();
-			var rTrim = expression[2].Trim();
 
-			if (!int.TryParse(lTrim, out _) && Enum.TryParse<DayOfWeek>(lTrim, out _) || !int.TryParse(rTrim, out _) && Enum.TryParse<DayOfWeek>(rTrim, out _))
-				throw new Exception("Why are you doing arithmetic with a day of the week??");
+		// horrible, complex, arithmetic expression :(
+		
+		var lTrim = expression[0].Trim();
+		var op = expression[1].Trim();
+		var rTrim = expression[2].Trim();
 
-			// try parse as date => RHS should be raw numeric value
+		if (!int.TryParse(lTrim, out _) && Enum.TryParse<DayOfWeek>(lTrim, out _) || !int.TryParse(rTrim, out _) && Enum.TryParse<DayOfWeek>(rTrim, out _))
+			throw new Exception("Why are you doing arithmetic with a day of the week??");
+
+		// try parse as date => RHS should be raw numeric value
 
 		if (DateOnly.TryParseExact(lTrim, "yyyy-MM-dd", out var lDate))
 		{
@@ -103,7 +106,7 @@ public static class ConstraintParser
 			return x => new ValueObject { Date = lDate.AddDays(op == "+" ? rNum : - rNum) };
 		}
 
-			// else try parse token => RHS depends on token
+		// else try parse token => RHS depends on token
 
 		if (Enum.TryParse(lTrim, out token))
 		{
@@ -124,17 +127,16 @@ public static class ConstraintParser
 			};
 		}
 
-			// else try parse raw numeric value => RHS should be date or token TODO less work if we require numerics to be RHS of op
+		// else try parse raw numeric value => RHS should be date or token TODO less work if we require numerics to be RHS of op
 
-			void GetRnum(Token token, string trimmed, out int num)
-			{
-				num = 0;
-				if (!int.TryParse(trimmed, out num))
-					throw new Exception($"RHS of arithmetic operation ({trimmed}) must be a numeric value when LHS token is \"{token}\".");
-			}
+		void GetRnum(Token token, string trimmed, out int num)
+		{
+			num = 0;
+			if (!int.TryParse(trimmed, out num))
+				throw new Exception($"RHS of arithmetic operation ({trimmed}) must be a numeric value when LHS token is \"{token}\".");
 		}
 
-		
+
 		throw new NotImplementedException();
 	}
 	
