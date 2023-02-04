@@ -43,7 +43,7 @@ public static class ConstraintParser
 
 	private static Func<DateOnly, ValueObject> GetValueFunction(string input, out Token token)
 	{
-		if (DateOnly.TryParseExact(input, "yyyy-MM-dd", out var date))
+		if (IsSpecifiedDate(input, out var date))
 		{
 			token = Token.Date;
 			return x => new ValueObject { Date = date };
@@ -64,51 +64,22 @@ public static class ConstraintParser
 
 		EnsureNotDayOfWeekArithmetic(left, right);
 
-		// try parse as date => RHS should be raw numeric value
-
 		var subtract = op == "-";
-		if (DateOnly.TryParseExact(left, "yyyy-MM-dd", out var lDate))
-		{
-			if (!int.TryParse(right, out var rNum))
-				throw new Exception("RHS of arithmetic operation must be a numeric value when LHS is a specified date");
-			token = Token.Date;
-			return x => new ValueObject { Date = lDate.AddDays(subtract ? -rNum : rNum) };
-		}
+		if (IsSpecifiedDate(left, out date))
+			return SpecifiedDateArithmetic(date, right, subtract, out token);
 
 		// else try parse token => RHS depends on token
 
-		if (Enum.TryParse(left, out token))
-		{
-			GetRnum(token, right, out var rNum);
-			if (subtract) rNum = -rNum;
-			return token switch
-			{
-				Token.Date => x => new ValueObject { Date = x.AddDays(rNum) },
-				Token.Day => x => new ValueObject { Value = x.Day + rNum },
-				Token.Month => x => new ValueObject { Value = x.Month + rNum },
-				Token.Year => x => new ValueObject { Value = x.Year + rNum },
-				Token.DayNumber => x => new ValueObject { Value = x.DayNumber + rNum },
-				Token.DayOfYear => x => new ValueObject { Value = x.DayOfYear + rNum },
-				Token.Easter => x => new ValueObject { Date = Easter(x).AddDays(rNum) },
-				Token.EndOfMonth => x => new ValueObject
-					{ Date = new DateOnly(x.Year, x.Month, DateTime.DaysInMonth(x.Year, x.Month)).AddDays(rNum) },
-				Token.DayOfWeek => throw new Exception("This path shouldn't be possible!"),
-				_ => throw new NotImplementedException(),
-			};
-		}
+		if (Enum.TryParse(left, out token)) // TODO this would parse ints as tokens!!
+			return TokenArithmetic(token, right, subtract);
 
 		// else try parse raw numeric value => RHS should be date or token TODO less work if we require numerics to be RHS of op
-
-		void GetRnum(Token token, string trimmed, out int num)
-		{
-			num = 0;
-			if (!int.TryParse(trimmed, out num))
-				throw new Exception($"RHS of arithmetic operation ({trimmed}) must be a numeric value when LHS token is \"{token}\".");
-		}
 
 
 		throw new NotImplementedException();
 	}
+
+	private static bool IsSpecifiedDate(string input, out DateOnly date) => DateOnly.TryParseExact(input, "yyyy-MM-dd", out date);
 
 	private static Func<DateOnly, ValueObject> SingleTokenValueFunction(string trimmed, out Token token)
 	{
@@ -148,6 +119,41 @@ public static class ConstraintParser
 		if (!int.TryParse(left, out _) && Enum.TryParse<DayOfWeek>(left, out _) ||
 		    !int.TryParse(right, out _) && Enum.TryParse<DayOfWeek>(right, out _))
 			throw new Exception("Why are you doing arithmetic with a day of the week??");
+	}
+	
+	private static Func<DateOnly, ValueObject> SpecifiedDateArithmetic(DateOnly lDate, string right, bool subtract, out Token token)
+	{
+		if (!int.TryParse(right, out var rNum))
+			throw new Exception("RHS of arithmetic operation must be a numeric value when LHS is a specified date");
+		token = Token.Date;
+		return x => new ValueObject { Date = lDate.AddDays(subtract ? -rNum : rNum) };
+	}
+
+	private static Func<DateOnly, ValueObject> TokenArithmetic(Token token, string right, bool subtract)
+	{
+		GetRnum(token, right, out var rNum);
+		if (subtract) rNum = -rNum;
+		return token switch
+		{
+			Token.Date => x => new ValueObject { Date = x.AddDays(rNum) },
+			Token.Day => x => new ValueObject { Value = x.Day + rNum },
+			Token.Month => x => new ValueObject { Value = x.Month + rNum },
+			Token.Year => x => new ValueObject { Value = x.Year + rNum },
+			Token.DayNumber => x => new ValueObject { Value = x.DayNumber + rNum },
+			Token.DayOfYear => x => new ValueObject { Value = x.DayOfYear + rNum },
+			Token.Easter => x => new ValueObject { Date = Easter(x).AddDays(rNum) },
+			Token.EndOfMonth => x => new ValueObject
+				{ Date = new DateOnly(x.Year, x.Month, DateTime.DaysInMonth(x.Year, x.Month)).AddDays(rNum) },
+			Token.DayOfWeek => throw new Exception("This path shouldn't be possible!"),
+			_ => throw new NotImplementedException(),
+		};
+	}
+	
+	private static void GetRnum(Token token, string trimmed, out int num)
+	{
+		num = 0;
+		if (!int.TryParse(trimmed, out num))
+			throw new Exception($"RHS of arithmetic operation ({trimmed}) must be a numeric value when LHS token is \"{token}\".");
 	}
 	
 	private static class Operators
