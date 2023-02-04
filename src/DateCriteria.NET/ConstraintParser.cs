@@ -98,12 +98,13 @@ public static class ConstraintParser
 
 		// try parse as date => RHS should be raw numeric value
 
+		var subtract = op == "-";
 		if (DateOnly.TryParseExact(lTrim, "yyyy-MM-dd", out var lDate))
 		{
 			if (!int.TryParse(rTrim, out var rNum))
 				throw new Exception("RHS of arithmetic operation must be a numeric value when LHS is a specified date");
 			token = Token.Date;
-			return x => new ValueObject { Date = lDate.AddDays(op == "+" ? rNum : - rNum) };
+			return x => new ValueObject { Date = lDate.AddDays(subtract ? -rNum : rNum) };
 		}
 
 		// else try parse token => RHS depends on token
@@ -111,17 +112,18 @@ public static class ConstraintParser
 		if (Enum.TryParse(lTrim, out token))
 		{
 			GetRnum(token, rTrim, out var rNum);
+			if (subtract) rNum = -rNum;
 			return token switch
 			{
-				Token.Date => x => new ValueObject { Date = x.AddDays(op == "+" ? rNum : -rNum) },
-				Token.Day => x => new ValueObject { Value = x.Day + op == "+" ? rNum : -rNum },
-				Token.Month => x => new ValueObject { Value = x.Month + op == "+" ? rNum : -rNum },
-				Token.Year => x => new ValueObject { Value = x.Year + op == "+" ? rNum : -rNum },
-				Token.DayNumber => x => new ValueObject { Value = x.DayNumber + op == "+" ? rNum : -rNum },
-				Token.DayOfYear => x => new ValueObject { Value = x.DayOfYear + op == "+" ? rNum : -rNum },
-				Token.Easter => x => new ValueObject { Date = Easter(x).AddDays(op == "+" ? rNum : -rNum) },
+				Token.Date => x => new ValueObject { Date = x.AddDays(rNum) },
+				Token.Day => x => new ValueObject { Value = x.Day + rNum },
+				Token.Month => x => new ValueObject { Value = x.Month + rNum },
+				Token.Year => x => new ValueObject { Value = x.Year + rNum },
+				Token.DayNumber => x => new ValueObject { Value = x.DayNumber + rNum },
+				Token.DayOfYear => x => new ValueObject { Value = x.DayOfYear + rNum },
+				Token.Easter => x => new ValueObject { Date = Easter(x).AddDays(rNum) },
 				Token.EndOfMonth => x => new ValueObject
-					{ Date = new DateOnly(x.Year, x.Month, DateTime.DaysInMonth(x.Year, x.Month)).AddDays(op == "+" ? rNum : -rNum) },
+					{ Date = new DateOnly(x.Year, x.Month, DateTime.DaysInMonth(x.Year, x.Month)).AddDays(rNum) },
 				Token.DayOfWeek => throw new Exception("This path shouldn't be possible!"),
 				_ => throw new NotImplementedException(),
 			};
