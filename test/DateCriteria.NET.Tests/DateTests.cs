@@ -98,7 +98,7 @@ public class DateTests
 	}
 
 	[Fact]
-	public void ArithemticTest()
+	public void ArithmeticTest()
 	{
 		var criteria = new DateCriteria();
 		criteria.AddRule("Date == EndOfMonth - 3");
