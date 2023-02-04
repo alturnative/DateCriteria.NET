@@ -1,15 +1,17 @@
 ﻿namespace DateCriteria.NET;
 
-public class DateConstraint
+public class DateConstraint : IEquatable<DateConstraint>
 {
-	internal string RuleText { get; set; } = string.Empty;
-	internal Func<DateOnly, bool> RuleAction { get; init; } = null!;
+	internal string Text { get; init; } = string.Empty;
+	internal Func<DateOnly, bool> Action { get; init; } = null!;
 
-	public override string ToString() => RuleText;
+	public override string ToString() => Text;
 
-	protected bool Equals(DateConstraint other)
+	#region Equality Members
+	
+	public bool Equals(DateConstraint? other)
 	{
-		return string.Equals(RuleText, other.RuleText, StringComparison.OrdinalIgnoreCase);
+		return string.Equals(Text, other?.Text, StringComparison.OrdinalIgnoreCase);
 	}
 
 	public override bool Equals(object? obj)
@@ -20,18 +22,11 @@ public class DateConstraint
 		return Equals((DateConstraint)obj);
 	}
 
-	public override int GetHashCode()
-	{
-		return StringComparer.OrdinalIgnoreCase.GetHashCode(RuleText);
-	}
+	public override int GetHashCode() => StringComparer.OrdinalIgnoreCase.GetHashCode(Text);
 
-	public static bool operator ==(DateConstraint? left, DateConstraint? right)
-	{
-		return Equals(left, right);
-	}
+	public static bool operator ==(DateConstraint? left, DateConstraint? right) => Equals(left, right);
 
-	public static bool operator !=(DateConstraint? left, DateConstraint? right)
-	{
-		return !Equals(left, right);
-	}
+	public static bool operator !=(DateConstraint? left, DateConstraint? right) => !Equals(left, right);
+
+	#endregion
 }

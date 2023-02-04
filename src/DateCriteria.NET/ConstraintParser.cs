@@ -23,7 +23,7 @@ public static class ConstraintParser
 		var lTrim = args[0].Trim();
 		var op = args[1].Trim();
 		var rTrim = args[2].Trim();
-		var ruleText = $"{lTrim}{op}{rTrim}";
+		var text = $"{lTrim}{op}{rTrim}";
 		Func<DateOnly, ValueObject> left = GetValueFunction(lTrim, out Token lToken);
 		Func<DateOnly, ValueObject> right = GetValueFunction(rTrim, out Token rToken);
 
@@ -35,12 +35,11 @@ public static class ConstraintParser
 
 		DateConstraint dateConstraint = lComparison switch
 		{
-			ComparisonType.Date => new() { RuleAction = x => DateComparers[op](left(x).Date!.Value, right(x).Date!.Value) },
-			ComparisonType.DayOfWeek => new() { RuleAction = x => DayOfWeekComparers[op](left(x).DayOfWeek!.Value, right(x).DayOfWeek!.Value) },
-			ComparisonType.Value => new() { RuleAction = x => ValueComparers[op](left(x).Value!.Value, right(x).Value!.Value) },
+			ComparisonType.Date => new() { Action = x => DateComparers[op](left(x).Date!.Value, right(x).Date!.Value), Text = text },
+			ComparisonType.DayOfWeek => new() { Action = x => DayOfWeekComparers[op](left(x).DayOfWeek!.Value, right(x).DayOfWeek!.Value), Text = text },
+			ComparisonType.Value => new() { Action = x => ValueComparers[op](left(x).Value!.Value, right(x).Value!.Value), Text = text },
 			_ => throw new NotImplementedException()
 		};
-		dateConstraint.RuleText = ruleText;
 
 		return dateConstraint;
 	}
