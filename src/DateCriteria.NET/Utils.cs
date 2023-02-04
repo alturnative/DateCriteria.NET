@@ -19,4 +19,14 @@ public static class Utils
 		}
 		return hashCode;
 	}
+
+	public static bool EnumTryParseStrict<TEnum>(string value, out TEnum result) where TEnum : struct
+		=> EnumTryParseStrict(value, false, out result);
+
+	public static bool EnumTryParseStrict<TEnum>(string value, bool ignoreCase, out TEnum result) where TEnum : struct
+	{
+		if (!int.TryParse(value, out _)) return Enum.TryParse(value, ignoreCase, out result);
+		result = default;
+		return false;
+	}
 }
