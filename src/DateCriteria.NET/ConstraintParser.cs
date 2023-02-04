@@ -24,19 +24,25 @@ public static class ConstraintParser
 		var op = args[1].Trim();
 		var rTrim = args[2].Trim();
 		var ruleText = $"{lTrim}{op}{rTrim}";
-		Func<DateOnly, ValueObject> left = GetValueFunction(lTrim, out Token token);
-		Func<DateOnly, ValueObject> right = GetValueFunction(rTrim, out _);
+		Func<DateOnly, ValueObject> left = GetValueFunction(lTrim, out Token lToken);
+		Func<DateOnly, ValueObject> right = GetValueFunction(rTrim, out Token rToken);
 
+		var lComparison = ComparisonTypes[lToken];
+		var rComparison = ComparisonTypes[rToken];
 
-		return token switch
+		if (lComparison != rComparison)
+			throw new Exception($"Incompatible operands in rule - \"{lTrim}\" ({lComparison}) is not comparable with \"{rTrim}\" ({rComparison}).");
+
+		DateConstraint dateConstraint = lComparison switch
 		{
-			Token.Date => new DateConstraint
-				{ RuleAction = x => DateComparers[op](left(x).Date.Value, right(x).Date.Value), RuleText = ruleText },
-			Token.DayOfWeek => new DateConstraint
-				{ RuleAction = x => DayOfWeekComparers[op](left(x).DayOfWeek.Value, right(x).DayOfWeek.Value), RuleText = ruleText },
-			Token.Day or Token.Month or Token.Year => new DateConstraint
-				{ RuleAction = x => ValueComparers[op](left(x).Value.Value, right(x).Value.Value), RuleText = ruleText }
+			ComparisonType.Date => new() { RuleAction = x => DateComparers[op](left(x).Date!.Value, right(x).Date!.Value) },
+			ComparisonType.DayOfWeek => new() { RuleAction = x => DayOfWeekComparers[op](left(x).DayOfWeek!.Value, right(x).DayOfWeek!.Value) },
+			ComparisonType.Value => new() { RuleAction = x => ValueComparers[op](left(x).Value!.Value, right(x).Value!.Value) },
+			_ => throw new NotImplementedException()
 		};
+		dateConstraint.RuleText = ruleText;
+
+		return dateConstraint;
 	}
 
 	private static Func<DateOnly, ValueObject> GetValueFunction(string input, out Token token)
