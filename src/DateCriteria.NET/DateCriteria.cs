@@ -17,18 +17,20 @@ public class DateCriteria : IDateCriteria
 		}
 	}
 
+	public bool RefreshCacheOnAdd { get; set; } = true;
+
 	public IList<IDateRule> Rules { get; } = new List<IDateRule>();
 
 	public void AddRule(string input, bool negate = false, string name = "")
 	{
 		Rules.Add(new DateRule(input, negate, name));
-		RefreshCache();
+		AfterRulesAdded();
 	}
 
 	public void AddRules(params (string input, bool negate, string name)[] rules)
 	{
 		foreach (var (input, negate, name) in rules) Rules.Add(new DateRule(input, negate, name));
-		RefreshCache();
+		AfterRulesAdded();
 	}
 
 	public bool Contains(DateOnly date) => _cache.GetOrAdd(date, ContainsPrivate(date));
@@ -43,4 +45,9 @@ public class DateCriteria : IDateCriteria
 	}
 
 	private bool ContainsPrivate(DateOnly date) => Rules.Any(x => x.Matches(date)) ^ Negate;
+
+	private void AfterRulesAdded()
+	{
+		if (RefreshCacheOnAdd) RefreshCache();
+	}
 }
