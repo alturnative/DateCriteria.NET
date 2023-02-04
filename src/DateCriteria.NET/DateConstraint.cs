@@ -3,7 +3,7 @@
 public class DateConstraint
 {
 	internal string RuleText { get; set; } = string.Empty;
-	internal Func<DateOnly, bool> RuleAction { get; set; }
+	internal Func<DateOnly, bool> RuleAction { get; set; } = null!;
 
 	public override string ToString() => RuleText;
 
