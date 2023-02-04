@@ -2,7 +2,7 @@
 
 public class DateRule : IDateRule, IEquatable<DateRule>
 {
-	public string Name { get; } = string.Empty;
+	public string Name { get; }
 	public bool Negate { get; } = false;
 	public ISet<DateConstraint> Constraints { get; } = new HashSet<DateConstraint>();
 
