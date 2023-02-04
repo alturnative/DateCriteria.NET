@@ -5,6 +5,7 @@ public class DateRule : IDateRule, IEquatable<DateRule>
 	public string Name { get; }
 	public bool Negate { get; } = false;
 	public ISet<DateConstraint> Constraints { get; } = new HashSet<DateConstraint>();
+	public string Text => string.Join(";", Constraints);
 
 	public DateRule(string rulesString, bool negate = false, string name = "")
 	{
