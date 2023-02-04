@@ -88,64 +88,24 @@ public static class ConstraintParser
 
 			// else try parse token => RHS depends on token
 
-			if (Enum.TryParse(lTrim, out Token lToken))
+		if (Enum.TryParse(lTrim, out token))
+		{
+			GetRnum(token, rTrim, out var rNum);
+			return token switch
 			{
-				if (lToken is Token.Date)
-				{
-					GetRnum(lToken, rTrim, out var rNum);
-					
-					return x => new ValueObject { Date = x.AddDays(op == "+" ? rNum : - rNum) };
-				}
-
-				if (lToken is Token.Day)
-				{
-					GetRnum(lToken, rTrim, out var rNum);
-					
-					return x => new ValueObject { Value = x.Day + op == "+" ? rNum : - rNum };
-				}
-
-				if (lToken is Token.Month)
-				{
-					GetRnum(lToken, rTrim, out var rNum);
-					
-					return x => new ValueObject { Value = x.Month + op == "+" ? rNum : - rNum };
-				}
-
-				if (lToken is Token.Year)
-				{
-					GetRnum(lToken, rTrim, out var rNum);
-					
-					return x => new ValueObject { Value = x.Year + op == "+" ? rNum : - rNum };
-				}
-
-				if (lToken is Token.DayNumber)
-				{
-					GetRnum(lToken, rTrim, out var rNum);
-					
-					return x => new ValueObject { Value = x.DayNumber + op == "+" ? rNum : - rNum };
-				}
-
-				if (lToken is Token.DayOfYear)
-				{
-					GetRnum(lToken, rTrim, out var rNum);
-					
-					return x => new ValueObject { Value = x.DayOfYear + op == "+" ? rNum : - rNum };
-				}
-
-				if (lToken is Token.Easter)
-				{
-					GetRnum(lToken, rTrim, out var rNum);
-					
-					return x => new ValueObject { Date = Easter(x).AddDays(op == "+" ? rNum : - rNum) };
-				}
-
-				if (lToken is Token.EndOfMonth)
-				{
-					GetRnum(lToken, rTrim, out var rNum);
-					
-					return x => new ValueObject { Date = new DateOnly(x.Year, x.Month, DateTime.DaysInMonth(x.Year, x.Month)).AddDays(op == "+" ? rNum : - rNum) };
-				}
-			}
+				Token.Date => x => new ValueObject { Date = x.AddDays(op == "+" ? rNum : -rNum) },
+				Token.Day => x => new ValueObject { Value = x.Day + op == "+" ? rNum : -rNum },
+				Token.Month => x => new ValueObject { Value = x.Month + op == "+" ? rNum : -rNum },
+				Token.Year => x => new ValueObject { Value = x.Year + op == "+" ? rNum : -rNum },
+				Token.DayNumber => x => new ValueObject { Value = x.DayNumber + op == "+" ? rNum : -rNum },
+				Token.DayOfYear => x => new ValueObject { Value = x.DayOfYear + op == "+" ? rNum : -rNum },
+				Token.Easter => x => new ValueObject { Date = Easter(x).AddDays(op == "+" ? rNum : -rNum) },
+				Token.EndOfMonth => x => new ValueObject
+					{ Date = new DateOnly(x.Year, x.Month, DateTime.DaysInMonth(x.Year, x.Month)).AddDays(op == "+" ? rNum : -rNum) },
+				Token.DayOfWeek => throw new Exception("This path shouldn't be possible!"),
+				_ => throw new NotImplementedException(),
+			};
+		}
 
 			// else try parse raw numeric value => RHS should be date or token TODO less work if we require numerics to be RHS of op
 
