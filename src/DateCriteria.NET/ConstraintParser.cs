@@ -56,49 +56,20 @@ public static class ConstraintParser
 		
 		var expression = Operators.Arithmetic.Split(input);
 		if (expression.Length is not (1 or 3)) throw new Exception($"Invalid expression in comparison: '{input}'.");
-		if (expression.Length == 1) // nice, simple, single token :)
-		{
-			var trimmed = expression[0].Trim();
-			if (Enum.TryParse(trimmed, true, out token))
-			{	// we got a nice token
-				return token switch
-				{
-					Token.Date => x => new ValueObject { Date = x },
-					Token.DayOfWeek => x => new ValueObject { DayOfWeek = x.DayOfWeek },
-					Token.Easter => x => new ValueObject { Date = Easter(x) },
-					Token.Day => x => new ValueObject { Value = x.Day },
-					Token.Month => x => new ValueObject { Value = x.Month },
-					Token.Year => x => new ValueObject { Value = x.Year },
-					Token.EndOfMonth => x => new ValueObject { Date = new DateOnly(x.Year, x.Month, DateTime.DaysInMonth(x.Year, x.Month)) },
-					_ => throw new NotImplementedException(),
-				};
-			}
-
-			if (Enum.TryParse(trimmed, true, out DayOfWeek dow))
-			{
-				token = Token.DayOfWeek;
-				return x => new ValueObject { DayOfWeek = dow };
-			}
-
-			throw new NotImplementedException();
-		}
+		if (expression.Length == 1) return SingleTokenValueFunction(expression[0].Trim(), out token);
 
 		// horrible, complex, arithmetic expression :(
 		
-		var op = expression[1].Trim();
-		if (op is not ("+" or "-")) throw new Exception($"Unsupported operator \"{op}\" in expression \"{input}\".");
-		var lTrim = expression[0].Trim();
-		var rTrim = expression[2].Trim();
+		var (left, op, right) = GetExpressionComponents(expression, input);
 
-		if (!int.TryParse(lTrim, out _) && Enum.TryParse<DayOfWeek>(lTrim, out _) || !int.TryParse(rTrim, out _) && Enum.TryParse<DayOfWeek>(rTrim, out _))
-			throw new Exception("Why are you doing arithmetic with a day of the week??");
+		EnsureNotDayOfWeekArithmetic(left, right);
 
 		// try parse as date => RHS should be raw numeric value
 
 		var subtract = op == "-";
-		if (DateOnly.TryParseExact(lTrim, "yyyy-MM-dd", out var lDate))
+		if (DateOnly.TryParseExact(left, "yyyy-MM-dd", out var lDate))
 		{
-			if (!int.TryParse(rTrim, out var rNum))
+			if (!int.TryParse(right, out var rNum))
 				throw new Exception("RHS of arithmetic operation must be a numeric value when LHS is a specified date");
 			token = Token.Date;
 			return x => new ValueObject { Date = lDate.AddDays(subtract ? -rNum : rNum) };
@@ -106,9 +77,9 @@ public static class ConstraintParser
 
 		// else try parse token => RHS depends on token
 
-		if (Enum.TryParse(lTrim, out token))
+		if (Enum.TryParse(left, out token))
 		{
-			GetRnum(token, rTrim, out var rNum);
+			GetRnum(token, right, out var rNum);
 			if (subtract) rNum = -rNum;
 			return token switch
 			{
@@ -137,6 +108,46 @@ public static class ConstraintParser
 
 
 		throw new NotImplementedException();
+	}
+
+	private static Func<DateOnly, ValueObject> SingleTokenValueFunction(string trimmed, out Token token)
+	{
+		if (Enum.TryParse(trimmed, true, out token))
+		{	// we got a nice token
+			return token switch
+			{
+				Token.Date => x => new ValueObject { Date = x },
+				Token.DayOfWeek => x => new ValueObject { DayOfWeek = x.DayOfWeek },
+				Token.Easter => x => new ValueObject { Date = Easter(x) },
+				Token.Day => x => new ValueObject { Value = x.Day },
+				Token.Month => x => new ValueObject { Value = x.Month },
+				Token.Year => x => new ValueObject { Value = x.Year },
+				Token.EndOfMonth => x => new ValueObject { Date = new DateOnly(x.Year, x.Month, DateTime.DaysInMonth(x.Year, x.Month)) },
+				_ => throw new NotImplementedException(),
+			};
+		}
+
+		if (Enum.TryParse(trimmed, true, out DayOfWeek dow))
+		{
+			token = Token.DayOfWeek;
+			return x => new ValueObject { DayOfWeek = dow };
+		}
+
+		throw new NotImplementedException();
+	}
+
+	private static (string left, string op, string right) GetExpressionComponents(string[] expression, string input)
+	{
+		var op = expression[1].Trim();
+		if (op is not ("+" or "-")) throw new Exception($"Unsupported operator \"{op}\" in expression \"{input}\".");
+		return (expression[0].Trim(), op, expression[2].Trim());
+	}
+
+	private static void EnsureNotDayOfWeekArithmetic(string left, string right)
+	{
+		if (!int.TryParse(left, out _) && Enum.TryParse<DayOfWeek>(left, out _) ||
+		    !int.TryParse(right, out _) && Enum.TryParse<DayOfWeek>(right, out _))
+			throw new Exception("Why are you doing arithmetic with a day of the week??");
 	}
 	
 	private static class Operators
