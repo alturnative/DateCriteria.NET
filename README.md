@@ -5,7 +5,10 @@ The constraints within a rule must *all* be satisfied for the rule to be
 considered a match for a given date, and *any* of the rules can match
 for a date to be considered satisfying that criteria as a whole. This can be
 used in any situation where calendar dates need to be flagged as meeting a
-specific criteria, such as: business v.s. non-business days, 
+specific criteria, such as: business v.s. non-business days.
+
+The status of a particular date is only calculated once, after which the
+value is cached and subsequently retrieved directly.
 
 Example:
 
@@ -21,12 +24,15 @@ criteria.Contains(new DateOnly(2023, 01, 31); // True, non-Wednesday end-of-mont
 ```
 
 Supported tokens:
-* Days of the week
-* `DayOfWeek`
 * `Date`
 * `Day`
 * `Month`
 * `Year`
+* Days of the week
+* `DayOfWeek`
+* `DayNumber`
+* `DayOfYear`
+* `Easter`
 * `EndOfMonth`
 
 Supported comparison operators:
@@ -37,6 +43,9 @@ Supported comparison operators:
 * `==`
 * `!=`
 
-Planned support for addition (`+`) and subtraction (`-`) arithmetic operations in the future,
-and potentially some form of caching and manual override for specific dates (if one were to reach
+Supported arithmetic operators:
+* `+`
+* `-`
+
+May potentially add some form of manual override for specific dates (if one were to reach
 a point where it was less expensive to, say, call a database rather than perform excessive calculations).
