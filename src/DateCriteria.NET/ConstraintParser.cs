@@ -78,7 +78,11 @@ public static class ConstraintParser
 				};
 			}
 
-			if (Enum.TryParse(trimmed, true, out DayOfWeek dow)) return x => new ValueObject { DayOfWeek = dow };
+			if (Enum.TryParse(trimmed, true, out DayOfWeek dow))
+			{
+				token = Token.DayOfWeek;
+				return x => new ValueObject { DayOfWeek = dow };
+			}
 		}
 		else // horrible, complex, arithmetic expression :(
 		{
