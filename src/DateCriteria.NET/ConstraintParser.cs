@@ -88,8 +88,9 @@ public static class ConstraintParser
 
 		// horrible, complex, arithmetic expression :(
 		
-		var lTrim = expression[0].Trim();
 		var op = expression[1].Trim();
+		if (op is not ("+" or "-")) throw new Exception($"Unsupported operator \"{op}\" in expression \"{input}\".");
+		var lTrim = expression[0].Trim();
 		var rTrim = expression[2].Trim();
 
 		if (!int.TryParse(lTrim, out _) && Enum.TryParse<DayOfWeek>(lTrim, out _) || !int.TryParse(rTrim, out _) && Enum.TryParse<DayOfWeek>(rTrim, out _))
