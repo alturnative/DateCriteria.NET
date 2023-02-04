@@ -1,5 +1,3 @@
-using DateCriteria.NET;
-
 namespace DateCriteria.NET.Tests;
 
 public class DateTests
