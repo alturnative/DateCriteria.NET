@@ -2,7 +2,7 @@
 
 namespace DateCriteria.NET;
 
-public class DateCriteria : IDateCriteria
+public class DateCriteria : IDateCriteria, IEquatable<DateCriteria>
 {
 	private readonly ConcurrentDictionary<DateOnly, bool> _cache = new();
 	private bool _negate = false;
@@ -50,4 +50,29 @@ public class DateCriteria : IDateCriteria
 	{
 		if (RefreshCacheOnAdd) RefreshCache();
 	}
+
+	#region Equality Members
+	
+	public bool Equals(DateCriteria? other)
+	{
+		if (ReferenceEquals(null, other)) return false;
+		if (ReferenceEquals(this, other)) return true;
+		return Rules.SetEquals(other.Rules);
+	}
+
+	public override bool Equals(object? obj)
+	{
+		if (ReferenceEquals(null, obj)) return false;
+		if (ReferenceEquals(this, obj)) return true;
+		if (obj.GetType() != this.GetType()) return false;
+		return Equals((DateCriteria)obj);
+	}
+
+	public override int GetHashCode() => Rules.EnumerableHashCode();
+
+	public static bool operator ==(DateCriteria? left, DateCriteria? right) => Equals(left, right);
+
+	public static bool operator !=(DateCriteria? left, DateCriteria? right) => !Equals(left, right);
+	
+	#endregion
 }
