@@ -4,9 +4,19 @@ namespace DateCriteria.NET;
 
 public class DateCriteria : IDateCriteria
 {
-	private ConcurrentDictionary<DateOnly, bool> _cache = new ConcurrentDictionary<DateOnly, bool>();
+	private readonly ConcurrentDictionary<DateOnly, bool> _cache = new();
+	private bool _negate = false;
 
-	public bool Negate { get; set; } = false;
+	public bool Negate
+	{
+		get => _negate;
+		set
+		{
+			_negate = value;
+			foreach (var pair in _cache) _cache[pair.Key] = !pair.Value;
+		}
+	}
+
 	public IList<IDateRule> Rules { get; } = new List<IDateRule>();
 
 	public void AddRule(string input, bool negate = false)

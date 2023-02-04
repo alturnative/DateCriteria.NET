@@ -114,6 +114,8 @@ public class DateTests
 	{
 		var criteria = new DateCriteria();
 		Assert.False(criteria.Contains(new DateOnly(2022, 12, 10)));
+		criteria.Negate = true;
+		Assert.True(criteria.Contains(new DateOnly(2022, 12, 10)));
 		criteria = new DateCriteria { Negate = true };
 		Assert.True(criteria.Contains(new DateOnly(2022, 12, 10)));
 	}
