@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using static System.StringSplitOptions;
+using static DateCriteria.NET.Utils;
 
 namespace DateCriteria.NET;
 
@@ -70,7 +71,7 @@ public static class ConstraintParser
 
 		// else try parse token => RHS depends on token
 
-		if (Enum.TryParse(left, out token)) // TODO this would parse ints as tokens!!
+		if (EnumTryParseStrict(left, out token))
 			return TokenArithmetic(token, right, subtract);
 
 		// else try parse raw numeric value => RHS should be date or token TODO less work if we require numerics to be RHS of op
@@ -116,8 +117,8 @@ public static class ConstraintParser
 
 	private static void EnsureNotDayOfWeekArithmetic(string left, string right)
 	{
-		if (!int.TryParse(left, out _) && Enum.TryParse<DayOfWeek>(left, out _) ||
-		    !int.TryParse(right, out _) && Enum.TryParse<DayOfWeek>(right, out _))
+		if (EnumTryParseStrict<DayOfWeek>(left, out _) ||
+		    EnumTryParseStrict<DayOfWeek>(right, out _))
 			throw new Exception("Why are you doing arithmetic with a day of the week??");
 	}
 	
