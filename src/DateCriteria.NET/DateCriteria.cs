@@ -19,12 +19,23 @@ public class DateCriteria : IDateCriteria
 
 	public IList<IDateRule> Rules { get; } = new List<IDateRule>();
 
-	public void AddRule(string input, bool negate = false)
+	public void AddRule(string input, bool negate = false, string name = "")
 	{
-		Rules.Add(new DateRule(input, negate));
+		Rules.Add(new DateRule(input, negate, name));
+		RefreshCache();
+	}
+
+	public void AddRules(params (string input, bool negate, string name)[] rules)
+	{
+		foreach (var (input, negate, name) in rules) Rules.Add(new DateRule(input, negate, name));
+		RefreshCache();
 	}
 
 	public bool Contains(DateOnly date) => _cache.GetOrAdd(date, ContainsPrivate(date));
+
+	public bool ContainsAny(params DateOnly[] dates) => dates.Any(Contains);
+	
+	public bool ContainsAll(params DateOnly[] dates) => dates.All(Contains);
 
 	public void RefreshCache()
 	{
