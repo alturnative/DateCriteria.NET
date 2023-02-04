@@ -5,9 +5,11 @@ namespace DateCriteria.NET;
 
 public static class ConstraintParser
 {
+	private const string ConstraintSeparator = ";";
+	
 	internal static void ParseConstraints(string input, Func<DateConstraint, bool> addRuleAction)
 	{
-		var stringRules = input.Split(";", TrimEntries | RemoveEmptyEntries);
+		var stringRules = input.Split(ConstraintSeparator, TrimEntries | RemoveEmptyEntries);
 		foreach (var rule in stringRules) addRuleAction(ParseConstraint(rule));
 	}
 
