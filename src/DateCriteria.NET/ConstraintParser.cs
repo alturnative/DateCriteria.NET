@@ -15,11 +15,6 @@ public static class ConstraintParser
 	{
 		var args = Operators.Comparison.Split(input);
 		if (args.Length != 3) throw new Exception($"Invalid rule definition in '{input}'.");
-		return HandleOperation(args);
-	}
-
-	private static DateConstraint HandleOperation(string[] args)
-	{
 		var lTrim = args[0].Trim();
 		var op = args[1].Trim();
 		var rTrim = args[2].Trim();
