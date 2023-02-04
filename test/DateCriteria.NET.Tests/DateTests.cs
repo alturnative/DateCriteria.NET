@@ -12,6 +12,11 @@ public class DateTests
 			x => Assert.True(x.Text == "date!=2022-12-19;date<2022-12-19;date<=2022-12-19"),
 			x => Assert.True(x.Text == "date==2022-12-25")
 			);
+		var criteria2 = new DateCriteria(
+			("date != 2022-12-19;date < 2022-12-19;date <= 2022-12-19", false, string.Empty),
+			("date == 2022-12-25", false, string.Empty)
+		);
+		Assert.True(criteria == criteria2);
 		Assert.True(criteria.Contains(new DateOnly(2022, 12, 15)));
 		Assert.True(criteria.Contains(new DateOnly(2022, 12, 25)));
 		Assert.False(criteria.Contains(new DateOnly(2022, 12, 19)));

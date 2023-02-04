@@ -21,6 +21,8 @@ public class DateCriteria : IDateCriteria, IEquatable<DateCriteria>
 
 	public ISet<IDateRule> Rules { get; } = new HashSet<IDateRule>();
 
+	public DateCriteria(params (string input, bool negate, string name)[] rules) => AddRules(rules);
+
 	public void AddRule(string input, bool negate = false, string name = "")
 	{
 		Rules.Add(new DateRule(input, negate, name));
