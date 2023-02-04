@@ -153,6 +153,19 @@ public static class ConstraintParser
 		{ ">=", (x, y) => x >= y },
 	};
 
+	private static Dictionary<Token, ComparisonType> ComparisonTypes { get; } = new()
+	{
+		{Token.Date, ComparisonType.Date},
+		{Token.Day, ComparisonType.Value},
+		{Token.Month, ComparisonType.Value},
+		{Token.Year, ComparisonType.Value},
+		{Token.DayOfWeek, ComparisonType.DayOfWeek},
+		{Token.DayNumber, ComparisonType.Value},
+		{Token.DayOfYear, ComparisonType.Value},
+		{Token.Easter, ComparisonType.Date},
+		{Token.EndOfMonth, ComparisonType.Date},
+	};
+
 	private struct ValueObject
 	{
 		internal DateOnly? Date;
@@ -256,4 +269,11 @@ enum Token
 	DayOfYear,
 	Easter,
 	EndOfMonth,
+}
+
+enum ComparisonType
+{
+	Date,
+	DayOfWeek,
+	Value,
 }
