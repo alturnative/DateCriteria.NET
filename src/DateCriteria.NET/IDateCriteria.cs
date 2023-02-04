@@ -3,7 +3,7 @@
 public interface IDateCriteria
 {
 	bool Negate { get; set; }
-	IList<IDateRule> Rules { get; }
+	ISet<IDateRule> Rules { get; }
 	void AddRule(string input, bool negate, string name);
 	void AddRules(params (string input, bool negate, string name)[] rules);
 

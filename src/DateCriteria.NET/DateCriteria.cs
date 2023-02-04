@@ -19,7 +19,7 @@ public class DateCriteria : IDateCriteria
 
 	public bool RefreshCacheOnAdd { get; set; } = true;
 
-	public IList<IDateRule> Rules { get; } = new List<IDateRule>();
+	public ISet<IDateRule> Rules { get; } = new HashSet<IDateRule>();
 
 	public void AddRule(string input, bool negate = false, string name = "")
 	{
