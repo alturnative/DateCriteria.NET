@@ -95,13 +95,13 @@ public static class ConstraintParser
 
 			// try parse as date => RHS should be raw numeric value
 
-			if (DateOnly.TryParseExact(lTrim, "yyyy-MM-dd", out var lDate))
-			{
-				if (!int.TryParse(rTrim, out var rNum))
-					throw new Exception("RHS of arithmetic operation must be a numeric value when LHS is a specified date");
-
-				return x => new ValueObject { Date = lDate.AddDays(op == "+" ? rNum : - rNum) };
-			}
+		if (DateOnly.TryParseExact(lTrim, "yyyy-MM-dd", out var lDate))
+		{
+			if (!int.TryParse(rTrim, out var rNum))
+				throw new Exception("RHS of arithmetic operation must be a numeric value when LHS is a specified date");
+			token = Token.Date;
+			return x => new ValueObject { Date = lDate.AddDays(op == "+" ? rNum : - rNum) };
+		}
 
 			// else try parse token => RHS depends on token
 
