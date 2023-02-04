@@ -21,7 +21,7 @@ public class DateRule : IDateRule, IEquatable<DateRule>
 	{
 		if (ReferenceEquals(null, other)) return false;
 		if (ReferenceEquals(this, other)) return true;
-		return Name == other.Name && Negate == other.Negate && Constraints.Equals(other.Constraints);
+		return Negate == other.Negate && Constraints.Equals(other.Constraints);
 	}
 
 	public override bool Equals(object? obj)
@@ -32,7 +32,7 @@ public class DateRule : IDateRule, IEquatable<DateRule>
 		return Equals((DateRule)obj);
 	}
 
-	public override int GetHashCode() => HashCode.Combine(Name, Negate, Constraints);
+	public override int GetHashCode() => HashCode.Combine(Negate, Constraints);
 
 	public static bool operator ==(DateRule? left, DateRule? right) => Equals(left, right);
 
