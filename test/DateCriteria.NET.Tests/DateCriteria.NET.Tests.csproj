@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\src\DateCriteria.NET\DateCriteria.NET\DateCriteria.NET.csproj" />
+	  <ProjectReference Include="..\..\src\DateCriteria.NET\DateCriteria.NET.csproj" />
 	</ItemGroup>
 
 </Project>
