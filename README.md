@@ -23,29 +23,31 @@ criteria.Contains(new DateOnly(2022, 12, 17); // True, weekend
 criteria.Contains(new DateOnly(2023, 01, 31); // True, non-Wednesday end-of-month
 ```
 
-Supported tokens:
-* `Date`
-* `Day`
-* `Month`
-* `Year`
-* Days of the week
-* `DayOfWeek`
-* `DayNumber`
-* `DayOfYear`
-* `Easter`
-* `EndOfMonth`
-
-Supported comparison operators:
-* `<`
-* `>`
-* `<=`
-* `>=`
-* `==`
-* `!=`
-
-Supported arithmetic operators:
-* `+`
-* `-`
+Supported:
+* Tokens:
+  * `Date`
+  * `Day`
+  * `Month`
+  * `Year`
+  * Days of the week
+  * `DayOfWeek`
+  * `DayNumber`
+  * `DayOfYear`
+  * `Easter`
+  * `EndOfMonth`
+* Values:
+  * Days of the week
+  * Signed 32-bit integers
+* Comparison operators:
+  * `<`
+  * `>`
+  * `<=`
+  * `>=`
+  * `==`
+  * `!=`
+* Arithmetic operators:
+  * `+`
+  * `-`
 
 May potentially add some form of manual override for specific dates (if one were to reach
 a point where it was less expensive to, say, call a database rather than perform excessive calculations).
