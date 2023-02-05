@@ -71,7 +71,7 @@ public static class ConstraintParser
 
 		// else try parse token => RHS depends on token
 
-		if (EnumTryParseStrict(left, out token))
+		if (EnumTryParseStrict(left, true, out token))
 			return TokenArithmetic(token, right, subtract);
 
 		// else try parse raw numeric value => RHS should be date or token TODO less work if we require numerics to be RHS of op
@@ -119,8 +119,8 @@ public static class ConstraintParser
 
 	private static void EnsureNotDayOfWeekArithmetic(string left, string right)
 	{
-		if (EnumTryParseStrict<DayOfWeek>(left, out _) ||
-		    EnumTryParseStrict<DayOfWeek>(right, out _))
+		if (EnumTryParseStrict<DayOfWeek>(left, true, out _) ||
+		    EnumTryParseStrict<DayOfWeek>(right, true, out _))
 			throw new Exception("Why are you doing arithmetic with a day of the week??");
 	}
 	
