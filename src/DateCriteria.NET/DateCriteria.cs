@@ -39,7 +39,7 @@ public class DateCriteria : IDateCriteria, IEquatable<DateCriteria>
 	{
 		if (_cache.TryGetValue(date, out var result)) return result;
 		result = ContainsPrivate(date);
-		_cache[date] = result;
+		_cache.TryAdd(date, result);
 		return result;
 	}
 
