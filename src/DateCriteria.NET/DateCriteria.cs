@@ -35,7 +35,13 @@ public class DateCriteria : IDateCriteria, IEquatable<DateCriteria>
 		AfterRulesAdded();
 	}
 
-	public bool Contains(DateOnly date) => _cache.TryGetValue(date, out var result) ? result : _cache.GetOrAdd(date, ContainsPrivate);
+	public bool Contains(DateOnly date)
+	{
+		if (_cache.TryGetValue(date, out var result)) return result;
+		result = ContainsPrivate(date);
+		_cache[date] = result;
+		return result;
+	}
 
 	public bool ContainsAny(params DateOnly[] dates) => dates.Any(Contains);
 	
