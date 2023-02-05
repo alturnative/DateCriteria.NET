@@ -95,6 +95,8 @@ public static class ConstraintParser
 				Token.Month => x => new ValueObject { Value = x.Month },
 				Token.Year => x => new ValueObject { Value = x.Year },
 				Token.EndOfMonth => x => new ValueObject { Date = new DateOnly(x.Year, x.Month, DateTime.DaysInMonth(x.Year, x.Month)) },
+				Token.DayNumber => x => new ValueObject { Value = x.DayNumber },
+				Token.DayOfYear => x => new ValueObject { Value = x.DayOfYear },
 				_ => throw new NotImplementedException(),
 			};
 		}
